@@ -29,8 +29,9 @@
     if (!code) {
       document.body.innerHTML = "<h1>Missing TikTok code</h1>";
     } else {
+      // FINAL WORKING URL — matches your backend
       window.location.href =
-        "http://localhost:3000/tiktok/exchange?code=" + encodeURIComponent(code);
+        "http://localhost:16666/tiktok/exchange?code=" + encodeURIComponent(code);
     }
   </script>
 </body>
