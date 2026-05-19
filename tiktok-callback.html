@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTok Login Callback</title>
+    <style>
+        body {
+            background: #0d0d0d;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 80px;
+        }
+        .box {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 20px #ff0040;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Connecting to TikTok…</h2>
+    <p>Please wait while we complete your login.</p>
+</div>
+
+<script>
+    // Extract TikTok OAuth code from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code") || urlParams.get("auth_code");
+
+    if (!code) {
+        document.body.innerHTML = `
+            <div class="box">
+                <h2>Login Error</h2>
+                <p>No TikTok authorization code was received.</p>
+            </div>
+        `;
+        throw new Error("No TikTok code found");
+    }
+
+    // SEND CODE TO YOUR BACKEND
+    fetch("https://YOUR_BACKEND_URL_HERE/tiktok/exchange", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            document.body.innerHTML = `
+                <div class="box">
+                    <h2>Login Failed</h2>
+                    <p>${data.error}</p>
+                </div>
+            `;
+            return;
+        }
+
+        // SUCCESS → Save token + redirect to your app
+        localStorage.setItem("tiktok_access_token", data.access_token);
+
+        window.location.href = "/"; // redirect to your main app
+    })
+    .catch(err => {
+        document.body.innerHTML = `
+            <div class="box">
+                <h2>Server Error</h2>
+                <p>Could not complete login.</p>
+            </div>
+        `;
+    });
+</script>
+
+</body>
+</html>
